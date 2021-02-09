@@ -1,0 +1,23 @@
+# Copyright (c) 2018 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its subsidiaries and/or its affiliates and/or their licensors.
+# Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG
+
+version: '3.3'
+services:
+    # Runs the Apama correlator, connecting to UM in the 'um' container, which may be on the same or a separate host.
+    # This correlator receives event from channel 'UM_TestChannel'
+    apamareceiver:
+        image: correlator-image
+        # Connect this container to the 'receiver' network created below
+        networks:
+            - receiver
+        depends_on:
+            - umsample-umhost
+        # Start up the correlator, init-receiver.yaml lists EPL files for this correlator
+        command: correlator --config /apama_work/UMSample/um-connectivity.yaml --config /apama_work/UMSample/init-receiver.yaml
+
+
+networks:
+    receiver:
+       external: 
+         name: sample-um_receiver
+ 
