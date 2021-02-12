@@ -16,7 +16,7 @@ event SampleSchema {
 	float timestamp;
 }
 
-monitor TestConverter {
+monitor PersistentMonitorTest {
 	constant string storeName := "MyStore";
 	constant string sensorTable := "SensorData";
 
