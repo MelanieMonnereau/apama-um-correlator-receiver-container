@@ -49,9 +49,10 @@ monitor PersistentMonitorTest {
 			{
 				count := 0;
 				integer temp := 37;
-				string key := "sensor"+count.toString();
+			
 				while (count < 3)
 				{
+					string key := "sensor"+count.toString();
 					Row row := tbl.get(key);
 					if not row.inTable() {
 						log "Row for "+ key + " is not present, adding a new row." at INFO;
@@ -69,6 +70,9 @@ monitor PersistentMonitorTest {
 						log "Row for "+ key + " is still not present in the table." at ERROR;
 					}
 					count:= count+1;
+					on Finished(id = store.persist()) {
+						log "Store persisted";
+					}
 				}
 			}
 		}
