@@ -1,0 +1,77 @@
+//$Copyright (c) 2016-2017 Software AG, Darmstadt, Germany and/or Software AG USA Inc., Reston, VA, USA, and/or its subsidiaries and/or its affiliates and/or their licensors.$ 
+//Use, reproduction, transfer, publication or disclosure is prohibited except as specifically provided for in your License Agreement with Software AG 
+
+using com.apama.memorystore.Row;
+using com.apama.memorystore.Storage;
+using com.apama.memorystore.Store;
+using com.apama.memorystore.Schema;
+using com.apama.memorystore.Table;
+using com.apama.memorystore.Finished;
+using com.apama.memorystore.RowChanged;
+
+event SampleSchema {
+	string sensorId;
+	string name;
+	string value;
+	float timestamp;
+}
+
+monitor TestConverter {
+	constant string storeName := "MyStore";
+	constant string sensorTable := "SensorData";
+
+	Store store;
+
+	action onload {
+		on all Finished(success=false) as f
+		{
+			log "Asynchronous MemoryStore operation failed: "+f.toString() at ERROR;
+			die;
+		}
+
+		log "Preparing store." at INFO;
+		on Finished(id = Storage.prepareDistributed(storeName), success=true) as f {
+			store := Storage.open(storeName);
+			testSensorTable();
+		}
+	}
+
+
+	action testSensorTable() {
+		log "Preparing table SensorData." at INFO;
+
+		on Finished(id = store.prepare(sensorTable, Schema.schemaFromAny(new SampleSchema)), success=true) as f {
+			log "Opening table SensorData and performing first write." at INFO;
+
+			Table tbl := store.open(sensorTable);
+			
+			on all wait(5.0)
+			{
+				integer i := 0;
+				integer temp := 37;
+				string key := "sensor"+i.toString();
+				while (i < 10)
+				{
+					Row row := tbl.get(key);
+					if not row.inTable() {
+						log "Row for "+ key + " is not present, adding a new row." at INFO;
+					} else {
+						log "Row for "+ key + " is already present, updating it." at INFO;
+					}
+
+					row.setAll(SampleSchema(key, "temperature", temp.rand().toString(), currentTime));
+					log "Committing changes to row." at INFO;
+					row.commit();
+
+					row := tbl.get(key);
+					if row.inTable() {
+						log "Row for "+ key + " is now present in the table: [" + row.getString("sensorId") +"," + row.getString("name") + "," + row.getString("value") + "," + row.getFloat("timestamp").toString() + "]" at INFO;
+					} else {
+						log "Row for "+ key + " is still not present in the table." at ERROR;
+					}
+					i:= i+1;
+				}
+			}
+		}
+	}
+}

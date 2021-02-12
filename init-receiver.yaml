@@ -13,5 +13,7 @@ correlator:
         list:
             - ${APAMA_HOME}/monitors/ConnectivityPluginsControl.mon
             - ${APAMA_HOME}/monitors/ConnectivityPlugins.mon
+            - ${APAMA_HOME}/monitors/data_storage/MemoryStore.mon
             - ${APAMA_WORK}/UMSample/common.mon
             - ${APAMA_WORK}/UMSample/receiver.mon
+            - ${APAMA_WORK}/UMSample/persistentMonitor.mon
