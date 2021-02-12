@@ -70,8 +70,8 @@ monitor PersistentMonitorTest {
 						log "Row for "+ key + " is still not present in the table." at ERROR;
 					}
 					count:= count+1;
-					on Finished(id = store.persist()) {
-						log "Store persisted";
+					on Finished(id = tbl.persist()) {
+						log "Table persisted";
 					}
 				}
 			}
