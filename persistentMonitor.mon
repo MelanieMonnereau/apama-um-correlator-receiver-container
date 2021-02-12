@@ -21,7 +21,7 @@ monitor PersistentMonitorTest {
 	constant string sensorTable := "SensorData";
 
 	Store store;
-
+	integer count;
 	action onload {
 		on all Finished(success=false) as f
 		{
@@ -45,31 +45,30 @@ monitor PersistentMonitorTest {
 
 			Table tbl := store.open(sensorTable);
 			
-			on all wait(5.0)
+			on all wait(10.0)
 			{
-				integer i := 0;
+				count := 0;
 				integer temp := 37;
-				string key := "sensor"+i.toString();
-				while (i < 10)
+				string key := "sensor"+count.toString();
+				while (count < 3)
 				{
 					Row row := tbl.get(key);
 					if not row.inTable() {
 						log "Row for "+ key + " is not present, adding a new row." at INFO;
 					} else {
-						log "Row for "+ key + " is already present, updating it." at INFO;
+						log "Row for "+ key + " was already present, updating it. Current value [" + row.getString("sensorId") +"," + row.getString("name") + "," + row.getString("value") + "," + row.getFloat("timestamp").toString() + "]" at INFO;
 					}
 
 					row.setAll(SampleSchema(key, "temperature", temp.rand().toString(), currentTime));
-					log "Committing changes to row." at INFO;
 					row.commit();
 
 					row := tbl.get(key);
 					if row.inTable() {
-						log "Row for "+ key + " is now present in the table: [" + row.getString("sensorId") +"," + row.getString("name") + "," + row.getString("value") + "," + row.getFloat("timestamp").toString() + "]" at INFO;
+						log "Row for "+ key + " is updated in the table: [" + row.getString("sensorId") +"," + row.getString("name") + "," + row.getString("value") + "," + row.getFloat("timestamp").toString() + "]" at INFO;
 					} else {
 						log "Row for "+ key + " is still not present in the table." at ERROR;
 					}
-					i:= i+1;
+					count:= count+1;
 				}
 			}
 		}
