@@ -30,7 +30,7 @@ monitor PersistentMonitorTest {
 		}
 
 		log "Preparing store." at INFO;
-		on Finished(id = Storage.prepareOrCreate(storeName,"receiverMemStore.dat"), success=true) as f {
+		on Finished(id = Storage.prepareOrCreate(storeName,"/apama_work/receiverMemStore.dat"), success=true) as f {
 			store := Storage.open(storeName);
 			testSensorTable();
 		}
