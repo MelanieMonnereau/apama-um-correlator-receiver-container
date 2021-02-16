@@ -19,7 +19,8 @@ MAINTAINER SoftwareAG
 
 COPY --chown=sagadmin:sagadmin common.mon receiver.mon persistentMonitor.mon um-connectivity.yaml init-receiver.yaml ${APAMA_WORK}/UMSample/
 
-RUN mkdir -p /${APAMA_WORK}/MemoryStoreData/
-RUN chown sagadmin /${APAMA_WORK}/MemoryStoreData/
+RUN ls -lrt ${APAMA_WORK}
+USER 1724
+RUN  mkdir -p ${APAMA_WORK}/MemoryStoreData/
 
 WORKDIR ${APAMA_WORK}/UMSample/
